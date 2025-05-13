@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda function with LangChain layer
+
+Parameters:
+  FunctionName:
+    Type: String
+    Default: langchain-demo-function
+    Description: Name of the Lambda function
+  
+  LayerName:
+    Type: String
+    Default: langchain-layer
+    Description: Name of the Lambda layer
+    
+  LayerBucket:
+    Type: String
+    Description: S3 bucket where the layer zip is stored
+  
+  LayerKey:
+    Type: String
+    Description: S3 key for the layer zip file
+    
+  FunctionBucket:
+    Type: String
+    Description: S3 bucket where the function zip is stored
+    
+  FunctionKey:
+    Type: String
+    Description: S3 key for the function zip file
+
+Resources:
+  LangChainLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: !Ref LayerName
+      Description: Layer containing LangChain and its dependencies
+      Content:
+        S3Bucket: !Ref LayerBucket
+        S3Key: !Ref LayerKey
+      CompatibleRuntimes:
+        - python3.9
+      CompatibleArchitectures:
+        - x86_64
+
+  LangChainFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref FunctionName
+      CodeUri: 
+        Bucket: !Ref FunctionBucket
+        Key: !Ref FunctionKey
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 256
+      Timeout: 30
+      Layers:
+        - !Ref LangChainLayer
+      LoggingConfig:
+        LogFormat: JSON
+        ApplicationLogLevel: INFO
+        SystemLogLevel: INFO
+
+Outputs:
+  LangChainFunction:
+    Description: LangChain Lambda Function ARN
+    Value: !GetAtt LangChainFunction.Arn
+  
+  LangChainLayer:
+    Description: LangChain Layer ARN
+    Value: !Ref LangChainLayer
