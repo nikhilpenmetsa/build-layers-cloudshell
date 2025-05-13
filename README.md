@@ -114,7 +114,7 @@ When you're done, clean up all resources:
 ## Notes
 
 - The example uses `FakeListLLM` for demonstration purposes
-- In a real application, you would use a real LLM provider like OpenAI
+- In a real application, you would use a real LLM provider like Amazon Bedrock
 - The Lambda function has a 30-second timeout, which may need adjustment for real LLM calls
 - The layer is compatible with Python 3.9 runtime
 - Building the layer in a Linux environment (like AWS CloudShell) ensures compatibility with Lambda's runtime environment
